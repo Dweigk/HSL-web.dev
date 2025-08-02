@@ -40,6 +40,13 @@ jobs:
       - name: Debug SSH Host Resolution
         run: nslookup ${{ secrets.SSH_HOST }}
 
+      - name: Check SSH_HOST secret
+        run: |
+          if [ -z "${{ secrets.SSH_HOST }}" ]; then
+          echo "SSH_HOST secret is not set!"
+          exit 1
+          fi
+
       - name: Deploy mit rsync
         if: success()
         run: |
