@@ -1,0 +1,36 @@
+name: CI-Pipeline
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build-test-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📥 Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: 🔧 Build ausführen
+        run: bash ./build.sh
+
+      - name: ✅ Tests ausführen
+        run: bash ./test.sh
+
+      - name: 🚨 Linting (optional)
+        if: exists('./lint.sh')
+        run: bash ./lint.sh
+
+      - name: 🔐 SSH-Agent starten
+        env:
+          DEPLOY_KEY: ${{ secrets.DEPLOY_KEY }}
+        run: |
+          echo "$DEPLOY_KEY" > key.pem
+          chmod 600 key.pem
+          eval "$(ssh-agent -s)"
+          ssh-add key.pem
+
+      - name: 🚀 Deployment ausführen
+        if: success() && github.ref == 'refs/heads/main'
+        run: bash ./deploy.sh
