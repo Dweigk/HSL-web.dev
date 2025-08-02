@@ -30,9 +30,17 @@ jobs:
           eval "$(ssh-agent -s)"
           ssh-add deploy_key.pem
 
+      - name: Debug Umgebungsvariablen
+        run: |
+          echo "SSH_HOST: ${{ secrets.SSH_HOST }}"
+          echo "SSH_USER: ${{ secrets.SSH_USER }}"
+          echo "SSH_PATH: ${{ secrets.SSH_PATH }}"
+        shell: bash
+
       - name: Deploy mit rsync
         if: success()
         run: |
-          rsync -avz --delete \
+          set -x
+          rsync -v -avz --delete \
             ./dist/ \
             ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:${{ secrets.SSH_PATH }}
