@@ -37,6 +37,9 @@ jobs:
           echo "SSH_PATH: ${{ secrets.SSH_PATH }}"
         shell: bash
 
+      - name: Debug SSH Host Resolution
+        run: nslookup ${{ secrets.SSH_HOST }}
+
       - name: Deploy mit rsync
         if: success()
         run: |
